@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .colorGreen{
+            width: 200px;
+            margin: 0 auto;
+            color: green;
+        }
+        .colorRed{
+            width: 200px;
+            margin: 0 auto;
+            color:red;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script src="./renderer.js"></script>
+<script src="./reactive.js"></script>
+<script src="./index.js"></script>
+<script>
+    function foo(){
+        let count = {
+            value:1,
+        }
+        function changeV(){
+            count.value++
+        }
+        let o = {
+            count,
+            changeV
+        }
+        return o
+    }
+    var o1 = foo()
+    o1.changeV()
+    console.log(o1.count.value)
+
+    var rootDom = document.getElementById('app')
+    const APP = {
+        setup(){
+            let count = ref(0)
+            function handleClick(){
+                count.value++
+            }
+            let product = reactive({
+                price:100,
+                n:2
+            })
+            let pay = computed(() => {
+                return product.price * product.n
+            })
+            function changePay(){
+                product.n++
+            }
+            return {
+                count,handleClick,pay,changePay
+            }
+        },
+        render(ctx){
+            return h('div',{class:'colorRed'},[
+                h('h2',{class:'colorGreen'},`count:${ctx.count.value}`),
+                h('button',{onClick:ctx.handleClick},'count++'),
+                h('h2',{},`pay${ctx.pay.value}`),
+                h('button',{onClick:ctx.changePay},'changePay')
+            ])
+
+        }
+    }
+    const app = createApp(APP)
+    console.log(app)
+    app.mount('#app') 
+ 
+</script>
+
+
+</html>
