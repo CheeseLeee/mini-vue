@@ -25,52 +25,17 @@
 <script src="./reactive.js"></script>
 <script src="./index.js"></script>
 <script>
-    function foo(){
-        let count = {
-            value:1,
-        }
-        function changeV(){
-            count.value++
-        }
-        let o = {
-            count,
-            changeV
-        }
-        return o
-    }
-    var o1 = foo()
-    o1.changeV()
-    console.log(o1.count.value)
-
     var rootDom = document.getElementById('app')
     const APP = {
-        setup(){
-            let count = ref(0)
-            function handleClick(){
-                count.value++
-            }
-            let product = reactive({
-                price:100,
-                n:2
-            })
-            let pay = computed(() => {
-                return product.price * product.n
-            })
-            function changePay(){
-                product.n++
-            }
+        setup(props,ctx){
+            let name = 'nike'
+            console.log('setup',props,ctx)
             return {
-                count,handleClick,pay,changePay
+                name
             }
         },
-        render(ctx){
-            return h('div',{class:'colorRed'},[
-                h('h2',{class:'colorGreen'},`count:${ctx.count.value}`),
-                h('button',{onClick:ctx.handleClick},'count++'),
-                h('h2',{},`pay${ctx.pay.value}`),
-                h('button',{onClick:ctx.changePay},'changePay')
-            ])
-
+        render(proxy){
+            console.log(proxy.a)
         }
     }
     const app = createApp(APP)

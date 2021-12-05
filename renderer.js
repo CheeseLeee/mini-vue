@@ -1,89 +1,115 @@
-
-
-const h = (tag,props,children) => {
-    console.log('?')
-    return {
-        tag,props,children
-    }
+function render(vnode,container){
+    patch(null,vnode,container)
 }
 
-const mount = (vnode,container) => {
-    console.log('mount')
-    var el = vnode.el = document.createElement(vnode.tag)
-    if(vnode.props){
-        for(var k in vnode.props){
-            if(k.startsWith('on')){
-                var methodKey = k.toLowerCase().substring(2)
-                el.addEventListener(methodKey,vnode.props[k])
-            }else{
-                var value = vnode.props[k]
-                el.setAttribute(k,value)
-            }
-
-        }
+function setupRenderEffect(instance){
+    instance.render()
+}
+function createVNode(type,props,children){
+    const shapeFlage = typeof type === 'string' ? '_isElement' : '_isComponent'
+    const vNode = {
+        _isVnode:true,
+        el:null,
+        type,
+        props,
+        children,
+        shapeFlage,
+        component:null
     }
-    if(vnode.children){
-        if(typeof vnode.children === 'string'){
-            el.textContent = vnode.children
-        }else{
-            vnode.children.forEach(element => {
-                mount(element,el)
-            });
-        }
-    }
-    container.appendChild(el)
+    return vNode
 }
 
-function patch(n1,n2){
-    if(n1.tag !== n2.tag){
-        const n1ElPartent = n1.el.parentNode
-        n1ElPartent.removeChild(n1.el)
-        mount(n2,n1ElPartent)
+function patch(n1,n2,container){
+    let {shapeFlage} = n2
+    if(shapeFlage === '_isElement'){
+        console.log('_isElement')
     }else{
-        const el = n2.el = n1.el
-        const oldProps = n1.props
-        const newProps = n2.props
-        for(var k in oldProps){
-            if(oldProps[k] !== newProps[k]){
-                console.log('no')
-                if(k.startsWith('on')){
-                    var methodKey = k.toLowerCase().substring(2)
-                    el.removeEventListener(methodKey,oldProps[k])
-                }else{
-                    el.removeAttribute(k)
-                }             
-            }
-        }
-        for(var k in newProps){
-            if(oldProps[k] !== newProps[k]){
-                if(k.startsWith('on')){
-                    var methodKey = k.toLowerCase().substring(2)
-                    el.addEventListener(methodKey,newProps[k])
-                }else{
-                    el.setAttribute(k,newProps[k])
+        console.log('_isComponent')
+        processComponent(n1,n2,container)
+    }
+}
+function processComponent(n1,n2,container){
+    if(n1 === null){
+        console.log('frist mount')
+        mountComponent(n2,container)
+    }else{
+
+    }
+}
+function mountComponent(initialVNode,container){
+    const instance = createComInstace(initialVNode)
+    setupComponent(instance)
+}
+
+function createComInstace(vnode){
+    const instance = {
+        vnode,
+        type:vnode.type,
+        props:{},
+        attrs:{},
+        slot:{},
+        setupState:{},
+        isMounted:false
+    }
+    instance.ctx = {_:instance}
+    return instance
+}
+
+function setupComponent(instance){
+    debugger
+    const {props,children} = instance.vnode
+    instance.props = props
+    instance.children = children
+    
+    const component = instance.type 
+    let setupCtx = createCtx(instance)
+    let {setup} = component
+    if(setup){
+        const setupResult = setup(instance.props,setupCtx)
+        handleSetupResult(instance,setupResult)
+        let handler = {
+            get({_ : instance},key,reciver){
+                const {setupState,props} = instance
+                if(key in setupState){
+                    return setupState[key]
+                }else if(key in props){
+                    return props[key]
                 }
+            },
+            set({_ : instance},key,value,reciver){
+                const {setupState,props} = instance
+                Reflect.set(setupState,key,value)
             }
         }
-        const oldChildren = n1.children
-        const newChildren = n2.children
-        if(typeof newChildren === 'string'){
-            el.innerHTML = newChildren
-        }else{//5 - 3 = 2 
-            const commonArr = Math.min(oldChildren.length,newChildren.length)
-            for(var i = 0; i < commonArr ; i++){
-                patch(oldChildren[i],newChildren[i])
-            }
-            if(oldChildren.length > newChildren.length){
-                oldChildren.slice(commonArr).forEach(item => {
-                    console.log(item)
-                    el.removeChild(item.el)
-                })              
-            }
-            if(oldChildren.length < newChildren.length){
-                newChildren.slice(commonArr).forEach(item => {
-                    mount(item,el)
-                })                
-            }
-        }
+        instance.proxy = new Proxy(instance.ctx,handler)
+        component.render(instance.proxy)
+    }else{
+        finshSetupComponent(instance)
+    }
+}
+
+function handleSetupResult(instance,setupResult){
+    if(typeof setupResult === 'function'){
+        instance.render = setupResult
+    }else if(typeof setupResult === 'object'){
+        instance.setupState = setupResult
+    }
+    finshSetupComponent(instance)
+}
+
+function finshSetupComponent(instance){
+    let component = instance.type
+    //let {render} = component
+    if(!instance.render){
+        //模版编译
+    }
+    instance.render = component.render
+}
+
+function createCtx(instance){
+    return {
+        attrs:instance.attrs,
+        slot:instance.slot,
+        emit:() => {}
     }
 }
