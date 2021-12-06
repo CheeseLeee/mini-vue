@@ -6,6 +6,7 @@ function createApp(rootComponent,componentProps){
         mount(container){
             app._container = container
             let vnode = createVNode(rootComponent,componentProps)
+            console.log(vnode)
             render(vnode,container)
         }
     }

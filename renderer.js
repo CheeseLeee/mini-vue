@@ -5,9 +5,9 @@ function render(vnode,container){
 function setupRenderEffect(instance){
     instance.render()
 }
-function createVNode(type,props,children){
+function createVNode(type,props,children = null){
     const shapeFlage = typeof type === 'string' ? '_isElement' : '_isComponent'
-    const vNode = {
+    const vnode = {
         _isVnode:true,
         el:null,
         type,
@@ -16,10 +16,22 @@ function createVNode(type,props,children){
         shapeFlage,
         component:null
     }
-    return vNode
+    normalizeChildren(vnode,children)
+    return vnode
 }
 
-function patch(n1,n2,container){
+function normalizeChildren(vnode,children){
+    if(children === null){
+
+    }else if(Array.isArray(children)){
+        type = 'array_children'
+    }else {
+        type = 'text_children'
+    }
+    //vnode.shapeFlage = 
+}
+
+function patch(n1 = null,n2,container){
     let {shapeFlage} = n2
     if(shapeFlage === '_isElement'){
         console.log('_isElement')
@@ -56,7 +68,7 @@ function createComInstace(vnode){
 }
 
 function setupComponent(instance){
-    debugger
+    
     const {props,children} = instance.vnode
     instance.props = props
     instance.children = children
