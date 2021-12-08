@@ -1,6 +1,6 @@
 function createApp(rootComponent){
-    let ctx = rootComponent.setup()
-   
+    processComponent(rootComponent)
+    let ctx = rootComponent.setup()   
     //ctx.count = 1  ==> count = 2
     return {
         mount(selector){
@@ -8,7 +8,6 @@ function createApp(rootComponent){
             let isMounted = false
             let oldVnode = null
             effect(() => {
-                console.log(ctx)         
                 if(!isMounted){
                     oldVnode = rootComponent.render(ctx)
                     mount(oldVnode,container)
@@ -19,7 +18,15 @@ function createApp(rootComponent){
                     oldVnode = newVnode
                 }
             })
-
         }
     }
+}
+
+function processComponent(rootComponent){
+    let instance = {
+        setup(){
+            
+        }
+    }
+    rootComponent._instance = instance
 }

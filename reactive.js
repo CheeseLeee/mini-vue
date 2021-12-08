@@ -26,7 +26,7 @@ product.quantity = 3
 product.price = 10
 //console.log(`total:${total};salePrice:${salePrice.value}`) //27,9 
 function track(target,key){
-    console.log(activeEffect)
+    
     if(activeEffect){
         let depsMap = targetMap.get(target)
         if(!depsMap){
@@ -53,13 +53,13 @@ function trigger(target,key){
 function reactive(target){
     const handler = {
         get(target,key,reciver){
-            console.log('get')
+           
             let result = Reflect.get(target,key,reciver)
             track(target,key)
             return result
         },
         set(target,key,value,reciver){
-            console.log('set')
+    
             if(target[key] !== value){
                 var result = Reflect.set(target,key,value,reciver) //boolean
                 trigger(target,key)
@@ -93,6 +93,6 @@ function computed(getter){
 }
 
 let count = ref(0)
-effect(() => console.log(count.value))
+
 count.value = 10
 

@@ -1,14 +1,19 @@
 
 
 const h = (tag,props,children) => {
-    console.log('?')
-    return {
-        tag,props,children
+    let vnode = {
+        tag,
+        props,
+        children
     }
+    if(typeof tag === 'string'){
+        return vnode
+    }else if(typeof tag === 'object' && tag !== null){                
+        return tag.render()
+    }    
 }
 
 const mount = (vnode,container) => {
-    console.log('mount')
     var el = vnode.el = document.createElement(vnode.tag)
     if(vnode.props){
         for(var k in vnode.props){
@@ -45,7 +50,7 @@ function patch(n1,n2){
         const newProps = n2.props
         for(var k in oldProps){
             if(oldProps[k] !== newProps[k]){
-                console.log('no')
+
                 if(k.startsWith('on')){
                     var methodKey = k.toLowerCase().substring(2)
                     el.removeEventListener(methodKey,oldProps[k])
@@ -75,7 +80,7 @@ function patch(n1,n2){
             }
             if(oldChildren.length > newChildren.length){
                 oldChildren.slice(commonArr).forEach(item => {
-                    console.log(item)
+
                     el.removeChild(item.el)
                 })              
             }

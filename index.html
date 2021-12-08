@@ -25,26 +25,20 @@
 <script src="./reactive.js"></script>
 <script src="./index.js"></script>
 <script>
-    function foo(){
-        let count = {
-            value:1,
-        }
-        function changeV(){
-            count.value++
-        }
-        let o = {
-            count,
-            changeV
-        }
-        return o
-    }
-    var o1 = foo()
-    o1.changeV()
-    console.log(o1.count.value)
-
     var rootDom = document.getElementById('app')
-    const APP = {
+    const HelloWorld = {
         setup(){
+
+        },
+        render(){
+            return h('p',{},[
+                h('h2',{},'我是Hello-world组件')
+            ])           
+        }
+    }
+
+    const APP = {
+        setup(props,ctx){
             let count = ref(0)
             function handleClick(){
                 count.value++
@@ -54,21 +48,30 @@
                 n:2
             })
             let pay = computed(() => {
-                return product.price * product.n
+                if(product.price > 300){
+                    return product.price * product.n
+                } else {
+                    return product.price
+                }
             })
             function changePay(){
-                product.n++
+                product.price += 100
+            }
+            function changePay2(){
+                product.n += 1
             }
             return {
-                count,handleClick,pay,changePay
+                count,handleClick,pay,changePay,changePay2
             }
         },
         render(ctx){
-            return h('div',{class:'colorRed'},[
+            return h('div',{class:'colorRed'},[               
                 h('h2',{class:'colorGreen'},`count:${ctx.count.value}`),
                 h('button',{onClick:ctx.handleClick},'count++'),
                 h('h2',{},`pay${ctx.pay.value}`),
-                h('button',{onClick:ctx.changePay},'changePay')
+                h('button',{onClick:ctx.changePay},'changePay'),
+                h('button',{onClick:ctx.changePay2},'changePay2'),
+                h(HelloWorld,{},{}),
             ])
 
         }
