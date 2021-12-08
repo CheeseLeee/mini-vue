@@ -24,6 +24,7 @@
 <script src="./renderer.js"></script>
 <script src="./reactive.js"></script>
 <script src="./index.js"></script>
+<script src="./unitls.js"></script>
 <script>
     var rootDom = document.getElementById('app')
     const HelloWorld = {
@@ -48,10 +49,10 @@
                 n:2
             })
             let pay = computed(() => {
-                if(product.price > 300){
-                    return product.price * product.n
+                if(product.price > 500){
+                    return product.price * product.n * 0.8
                 } else {
-                    return product.price
+                    return product.price * product.n
                 }
             })
             function changePay(){
@@ -61,16 +62,17 @@
                 product.n += 1
             }
             return {
-                count,handleClick,pay,changePay,changePay2
+                count,handleClick,pay,changePay,changePay2,product
             }
         },
-        render(ctx){
+        render(proxy){
             return h('div',{class:'colorRed'},[               
-                h('h2',{class:'colorGreen'},`count:${ctx.count.value}`),
-                h('button',{onClick:ctx.handleClick},'count++'),
-                h('h2',{},`pay${ctx.pay.value}`),
-                h('button',{onClick:ctx.changePay},'changePay'),
-                h('button',{onClick:ctx.changePay2},'changePay2'),
+                h('h2',{class:'colorGreen'},`count:${proxy.count.value}`),
+                h('button',{onClick:proxy.handleClick},'count++'),
+                h('h2',{},`pay${proxy.pay.value}`),
+                h('h2',{},`n--${proxy.product.n}`),
+                h('button',{onClick:proxy.changePay},'changePay'),
+                h('button',{onClick:proxy.changePay2},'changePay2'),
                 h(HelloWorld,{},{}),
             ])
 

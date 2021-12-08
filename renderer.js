@@ -8,7 +8,7 @@ const h = (tag,props,children) => {
     }
     if(typeof tag === 'string'){
         return vnode
-    }else if(typeof tag === 'object' && tag !== null){                
+    }else if(isObject(tag)){                
         return tag.render()
     }    
 }
